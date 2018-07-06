@@ -6,7 +6,7 @@ namespace hsng
 {
 namespace detail
 {
-template <size_t I, typename T>
+template <std::size_t I, typename T>
 struct tuple_n
 {
     template <typename... Args>
@@ -19,7 +19,7 @@ struct tuple_n<0, T>
     template <typename... Args>
     using type = std::tuple<Args...>;
 };
-template <size_t I, typename T>
+template <std::size_t I, typename T>
 using tuple_of = typename tuple_n<I, T>::template type<>;
 
 template <typename FwdIt>
@@ -48,9 +48,12 @@ std::tuple<typename std::iterator_traits<FwdIts>::reference...> dereference(std:
 }
 } // namespace detail
 
-template <std::size_t N, typename FwdIt>
+template <typename IterTuple>
 class adjacent_iterator
 {
+    static constexpr auto N = std::tuple_size<IterTuple>::value;
+    using FwdIt = typename std::tuple_element<0, IterTuple>::type;
+
   public:
     using difference_type = std::ptrdiff_t;
     using value_type = detail::tuple_of<N, typename std::iterator_traits<FwdIt>::reference>;
@@ -89,27 +92,29 @@ class adjacent_iterator
     }
 
   private:
-    detail::tuple_of<N, FwdIt> m_iter;
+    IterTuple m_iter;
 };
 
 template <std::size_t N, typename FwdIt>
 class adjacent_range
 {
+    using IterTuple = detail::tuple_of<N, FwdIt>;
+
   public:
-    using iterator = adjacent_iterator<N, FwdIt>;
-    using const_iterator = adjacent_iterator<N, FwdIt>;
+    using iterator = adjacent_iterator<IterTuple>;
+    using const_iterator = adjacent_iterator<IterTuple>;
 
     adjacent_range(FwdIt first, FwdIt last)
         : m_first{first}, m_last{last} {}
 
-    adjacent_iterator<N, FwdIt> begin() const
+    adjacent_iterator<IterTuple> begin() const
     {
-        return adjacent_iterator<N, FwdIt>{m_first, m_last};
+        return adjacent_iterator<IterTuple>{m_first, m_last};
     }
 
-    adjacent_iterator<N, FwdIt> end() const
+    adjacent_iterator<IterTuple> end() const
     {
-        return adjacent_iterator<N, FwdIt>{m_last, m_last};
+        return adjacent_iterator<IterTuple>{m_last, m_last};
     }
 
   private:
