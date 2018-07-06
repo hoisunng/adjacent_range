@@ -11,7 +11,7 @@ void test2(const std::vector<int> &v)
 
     for (const auto &p : make_adjacent_range<2>(v))
     {
-        std::cout << std::get<0>(p) << "/" << std::get<1>(p) << " ";
+        std::cout << p.first << "/" << p.second << " ";
     }
     std::cout << "]"
               << std::endl;
@@ -24,7 +24,6 @@ void test3(const std::vector<int> &v)
 
     for (const auto &p : make_adjacent_range<3>(v))
     {
-        // std::cout << std::get<0>(p) << "/" << std::get<1>(p) << " ";
         std::cout << std::get<0>(p) << "/" << std::get<1>(p) << "/" << std::get<2>(p) << " ";
     }
     std::cout << "]"
